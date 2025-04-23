@@ -82,6 +82,22 @@ namespace CourseManager.Controllers
                 return RedirectToAction("Index", "Courses");
             }
 
+            var registeredCount = _context.Registration.Count(r => r.CourseId == courseId);
+
+            var course = _context.Course.Find(courseId);
+            if (course == null)
+            {
+                TempData["Message"] = "Khóa học không tồn tại.";
+                return RedirectToAction("Index", "Courses");
+            }
+
+            // Kiểm tra số lượng
+            if (course.maxStudents.HasValue && registeredCount >= course.maxStudents.Value)
+            {
+                TempData["Message"] = "Khóa học đã đủ số lượng sinh viên!";
+                return RedirectToAction("Index", "Courses");
+            }
+
             var registration = new Registration
             {
                 CourseId = courseId,

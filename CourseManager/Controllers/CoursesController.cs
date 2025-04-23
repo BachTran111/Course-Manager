@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +21,32 @@ namespace CourseManager.Controllers
         // GET: Courses
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Course.ToListAsync());
+            var courses = await _context.Course.ToListAsync();
+
+            // Lấy danh sách số lượng đăng ký theo từng courseId
+            var registrations = await _context.Registration
+                .GroupBy(r => r.CourseId)
+                .Select(g => new
+                {
+                    CourseId = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            var courseVMs = courses.Select(course =>
+            {
+                var count = registrations.FirstOrDefault(r => r.CourseId == course.courseId)?.Count ?? 0;
+
+                return new CourseModel
+                {
+                    Course = course,
+                    RegisteredCount = count
+                };
+            }).ToList();
+
+            return View(courseVMs);
         }
+
 
         // GET: Courses/Details/5
         public async Task<IActionResult> Details(int? id)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -52,10 +53,11 @@ namespace CourseManager.Controllers
 
             var userVM = await _context.User
                 .Where(u => u.UserId == id)
-                .Select(u => new UserEditModel
+                .Select(u => new User
                 {
                     UserId = u.UserId,
                     FullName = u.FullName,
+                    Username = u.Username,
                     DateOfBirth = u.DateOfBirth,
                     PhoneNumber = u.PhoneNumber,
                     Password = u.Password,
@@ -72,7 +74,7 @@ namespace CourseManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, UserEditModel model)
+        public async Task<IActionResult> Edit(int id, User model)
         {
             if (id != model.UserId)
                 return NotFound();
@@ -84,6 +86,8 @@ namespace CourseManager.Controllers
                 .Select(u => new User
                 {
                     UserId = u.UserId,
+                    Username = u.Username,
+                    Email = u.Email,
                     FullName = u.FullName,
                     DateOfBirth = u.DateOfBirth,
                     PhoneNumber = u.PhoneNumber,

@@ -27,5 +27,6 @@ namespace CourseManager.Models
 
         [ForeignKey("UserId")]
         public virtual User User { get; set; }
+
     }
 }
