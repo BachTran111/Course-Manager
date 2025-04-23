@@ -19,33 +19,33 @@ namespace CourseManager.Controllers
         }
 
         // GET: Courses
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
-            var courses = await _context.Course.ToListAsync();
+            var query = from course in _context.Course
+                        join registration in _context.Registration
+                        on course.courseId equals registration.CourseId into courseRegs
+                        from reg in courseRegs.DefaultIfEmpty()
+                        group reg by course into g
+                        select new CourseModel
+                        {
+                            Course = g.Key,
+                            RegisteredCount = g.Count(r => r != null)
+                        };
 
-            // Lấy danh sách số lượng đăng ký theo từng courseId
-            var registrations = await _context.Registration
-                .GroupBy(r => r.CourseId)
-                .Select(g => new
-                {
-                    CourseId = g.Key,
-                    Count = g.Count()
-                })
-                .ToListAsync();
-
-            var courseVMs = courses.Select(course =>
+            // Áp dụng sắp xếp
+            query = sortOrder switch
             {
-                var count = registrations.FirstOrDefault(r => r.CourseId == course.courseId)?.Count ?? 0;
+                "price_asc" => query.OrderBy(c => c.Course.fee),
+                "price_desc" => query.OrderByDescending(c => c.Course.fee),
+                _ => query.OrderBy(c => c.Course.courseName)
+            };
 
-                return new CourseModel
-                {
-                    Course = course,
-                    RegisteredCount = count
-                };
-            }).ToList();
+            var courseVMs = await query.ToListAsync();
 
+            ViewData["SortOrder"] = sortOrder;
             return View(courseVMs);
         }
+
 
 
         // GET: Courses/Details/5

@@ -11,6 +11,7 @@
 @{
     ViewData["Title"] = "Danh sách khóa học";
     var roleId = Context.Session.GetInt32("RoleId");
+    var sortOrder = ViewData["SortOrder"] as string;
 }
 
 <style>
@@ -21,12 +22,26 @@
     }
 </style>
 
-
 <div class="container mt-5">
-    <div class="row mb-4">
+    <div class="row mb-4 d-flex justify-content-between align-items-center">
         <div class="col">
             <h2 class="text-primary">@ViewData["Title"]</h2>
         </div>
+
+        <!-- Thêm phần chọn sắp xếp -->
+        <div class="col-auto text-end">
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Sắp xếp theo giá
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="@Url.Action("Index", new { sortOrder = "price_asc" })">Giá (Tăng dần)</a></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Index", new { sortOrder = "price_desc" })">Giá (Giảm dần)</a></li>
+                    <li><a class="dropdown-item" href="@Url.Action("Index", new { sortOrder = "" })">Theo tên khóa học</a></li>
+                </ul>
+            </div>
+        </div>
+
         @if (roleId == 1)
         {
             <div class="col text-end">
@@ -38,6 +53,21 @@
     </div>
 
     <div class="row">
+        @if (roleId == 1)
+        {
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2">
+                            <a class="nav-link" asp-controller="Admins" asp-action="Index">
+                                <i class="bi bi-bar-chart-line"></i>
+                                Thống kê
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        }
         @foreach (var item in Model)
         {
             <div class="col-12 mb-4">
@@ -56,7 +86,6 @@
                                     <span class="text-muted">Không có ảnh</span>
                                 </div>
                             }
-
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
@@ -83,9 +112,7 @@
                                         <a asp-action="Details" asp-route-id="@item.Course.courseId" class="btn btn-info text-white btn-sm me-2">
                                             <i class="bi bi-eye"></i> Xem
                                         </a>
-                                        <a asp-action="Edit" asp-route-id="@item.Course.courseId" class="btn btn-primary btn-sm me-2">
-                                            <i class="bi bi-pencil"></i> Sửa
-                                        </a>
+                                       
                                         <a asp-action="Delete" asp-route-id="@item.Course.courseId" class="btn btn-danger btn-sm">
                                             <i class="bi bi-trash"></i> Xóa
                                         </a>
@@ -111,7 +138,6 @@
                                                 </button>
                                             </form>
                                         }
-
                                     }
                                 </div>
                             </div>

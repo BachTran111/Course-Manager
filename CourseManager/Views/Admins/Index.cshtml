@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Thống kê tổng quan";
+}
+
+<h2 class="mt-4">@ViewData["Title"]</h2>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Tổng số khóa học</h5>
+                <p class="card-text fs-4">@ViewData["TotalCourses"]</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Tổng số người dùng</h5>
+                <p class="card-text fs-4">@ViewData["TotalUsers"]</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Tổng lượt đăng ký</h5>
+                <p class="card-text fs-4">@ViewData["TotalRegistrations"]</p>
+            </div>
+        </div>
+    </div>
+</div>

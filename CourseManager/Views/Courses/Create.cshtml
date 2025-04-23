@@ -5,46 +5,74 @@
 }
 
 <div class="container mt-5">
-    <h2>@ViewData["Title"]</h2>
-    <form asp-action="Create" method="post" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="courseCode" class="form-label">Course Code</label>
-            <input type="text" class="form-control" id="courseCode" name="courseCode" value="@Model.courseCode" required maxlength="20">
-        </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
 
-        <div class="mb-3">
-            <label for="courseName" class="form-label">Course Name</label>
-            <input type="text" class="form-control" id="courseName" name="courseName" value="@Model.courseName" required maxlength="150">
-        </div>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Thêm khóa học mới</h4>
+                </div>
 
-        <div class="mb-3">
-            <label for="instructor" class="form-label">Instructor</label>
-            <input type="text" class="form-control" id="instructor" name="instructor" value="@Model.instructor" maxlength="100">
-        </div>
+                <div class="card-body">
+                    <<form asp-action="Create" enctype="multipart/form-data" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-        <div class="mb-3">
-            <label for="startDate" class="form-label">Start Date</label>
-            <input type="date" class="form-control" id="startDate" name="startDate" value="@Model.startDate?.ToString("yyyy-MM-dd")">
-        </div>
+                        <div class="mb-3">
+                            <label asp-for="courseCode" class="form-label">Mã Học Phần</label>
+                            <input asp-for="courseCode" class="form-control" />
+                            <span asp-validation-for="courseCode" class="text-danger"></span>
+                        </div>
 
-        <div class="mb-3">
-            <label for="fee" class="form-label">Fee</label>
-            <input type="number" step="0.01" class="form-control" id="fee" name="fee" value="@Model.fee" placeholder="e.g., 100.00">
-        </div>
+                        <div class="mb-3">
+                            <label asp-for="courseName" class="form-label">Tên Học Phần</label>
+                            <input asp-for="courseName" class="form-control" />
+                            <span asp-validation-for="courseName" class="text-danger"></span>
+                        </div>
 
-        <div class="mb-3">
-            <label for="maxStudents" class="form-label">Max Students</label>
-            <input type="number" class="form-control" id="maxStudents" name="maxStudents" value="@Model.maxStudents" min="1">
-        </div>
+                        <div class="mb-3">
+                            <label asp-for="instructor" class="form-label">Giảng Viên</label>
+                            <input asp-for="instructor" class="form-control" />
+                            <span asp-validation-for="instructor" class="text-danger"></span>
+                        </div>
 
-        <div class="mb-3">
-            <label for="imageUrl" class="form-label">Course Image</label>
-            <input type="file" class="form-control" id="imageUrl" name="ImageUrl" accept="image/*">
-        </div>
+                        <div class="mb-3">
+                            <label asp-for="startDate" class="form-label">Ngày Khai Giảng</label>
+                            <input asp-for="startDate" class="form-control" type="date" />
+                            <span asp-validation-for="startDate" class="text-danger"></span>
+                        </div>
 
-        <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-primary">Create Course</button>
-            <a href="@Url.Action("Index", "Course")" class="btn btn-secondary">Back to List</a>
+                        <div class="mb-3">
+                            <label asp-for="fee" class="form-label">Học Phí</label>
+                            <input asp-for="fee" class="form-control" />
+                            <span asp-validation-for="fee" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="maxStudents" class="form-label">Số Học Viên Tối Đa</label>
+                            <input asp-for="maxStudents" class="form-control" />
+                            <span asp-validation-for="maxStudents" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ImageFile" class="form-label">Tải Ảnh Lên</label>
+                            <input type="file" name="ImageFile" class="form-control" />
+                        </div>
+
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">← Quay lại</a>
+                            <button type="submit" class="btn btn-success">Tạo mới</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </div>
-    </form>
+    </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
