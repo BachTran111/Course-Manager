@@ -15,5 +15,7 @@ namespace CourseManager.Data
         }
 
         public DbSet<CourseManager.Models.Course> Course { get; set; } = default!;
+        public DbSet<CourseManager.Models.User> User { get; set; } = default!;
+        public DbSet<CourseManager.Models.Registration> Registration { get; set; } = default!;
     }
 }

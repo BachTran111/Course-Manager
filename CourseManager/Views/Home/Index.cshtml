@@ -1,8 +1,72 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-7">
+            <h1 class="display-3 fw-bold">Welcome to CourseManager</h1>
+            <p class="lead text-secondary">
+                Effortlessly manage your courses, registrations, and payments all in one place.
+            </p>
+            <a asp-controller="Courses" asp-action="Index" class="btn btn-primary btn-lg me-3">
+                <i class="bi bi-book me-1"></i>Browse Courses
+            </a>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-lg">
+                <i class="bi bi-person-plus me-1"></i>Get Started
+            </a>
+        </div>
+        <div class="col-lg-5 text-center">
+            <i class="bi bi-journal-code display-1 text-muted"></i>
+        </div>
+    </div>
+
+    <hr class="my-5" />
+
+    <!-- Features Section -->
+    <div class="row gy-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <i class="bi bi-book display-4 text-primary"></i>
+                    <h5 class="card-title mt-3">Browse Courses</h5>
+                    <p class="card-text">
+                        Explore all available courses and find the right one for you.
+                    </p>
+                    <a asp-controller="Courses" asp-action="Index" class="btn btn-sm btn-primary">
+                        View Courses
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <i class="bi bi-person-plus display-4 text-success"></i>
+                    <h5 class="card-title mt-3">Create Account</h5>
+                    <p class="card-text">
+                        Sign up quickly to start registering for courses.
+                    </p>
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-sm btn-success">
+                        Register Now
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 text-center">
+                <div class="card-body">
+                    <i class="bi bi-box-arrow-in-right display-4 text-warning"></i>
+                    <h5 class="card-title mt-3">Login</h5>
+                    <p class="card-text">
+                        Already have an account? Log in to manage your profile.
+                    </p>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-sm btn-warning text-white">
+                        Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,0 +1,48 @@
+﻿@model CourseManager.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Đăng nhập</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Login" novalidate>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div asp-validation-summary="All" class="alert alert-danger"></div>
+                        }
+
+                        <div class="mb-3">
+                            <label asp-for="Username" class="form-label"></label>
+                            <input asp-for="Username" class="form-control" />
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" class="form-control" type="password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Đăng nhập</button>
+                    </form>
+                </div>
+            </div>
+            <div class="text-center mt-2">
+                <a asp-action="Register">Chưa có tài khoản? Đăng ký</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
