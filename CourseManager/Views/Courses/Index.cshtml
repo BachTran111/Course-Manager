@@ -1,6 +1,16 @@
 ﻿@model IEnumerable<CourseManager.Models.Course>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-1"></i> @TempData["Message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 @{
     ViewData["Title"] = "Danh sách khóa học";
+    var roleId = Context.Session.GetInt32("RoleId");
 }
 
 <style>
@@ -17,11 +27,14 @@
         <div class="col">
             <h2 class="text-primary">@ViewData["Title"]</h2>
         </div>
-        <div class="col text-end">
-            <a asp-action="Create" class="btn btn-success">
-                <i class="bi bi-plus-lg"></i> Thêm mới
-            </a>
-        </div>
+        @if (roleId == 1)
+        {
+            <div class="col text-end">
+                <a asp-action="Create" class="btn btn-success">
+                    <i class="bi bi-plus-lg"></i> Thêm mới
+                </a>
+            </div>
+        }
     </div>
 
     <div class="row">
@@ -65,15 +78,41 @@
                                 </p>
 
                                 <div class="d-flex">
-                                    <a asp-action="Details" asp-route-id="@item.courseId" class="btn btn-info text-white btn-sm me-2">
-                                        <i class="bi bi-eye"></i> Xem
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@item.courseId" class="btn btn-primary btn-sm me-2">
-                                        <i class="bi bi-pencil"></i> Sửa
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@item.courseId" class="btn btn-danger btn-sm">
-                                        <i class="bi bi-trash"></i> Xóa
-                                    </a>
+                                    @if (roleId == 1)
+                                    {
+                                        <a asp-action="Details" asp-route-id="@item.courseId" class="btn btn-info text-white btn-sm me-2">
+                                            <i class="bi bi-eye"></i> Xem
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.courseId" class="btn btn-primary btn-sm me-2">
+                                            <i class="bi bi-pencil"></i> Sửa
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.courseId" class="btn btn-danger btn-sm">
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Details" asp-route-id="@item.courseId" class="btn btn-info text-white btn-sm me-2">
+                                            <i class="bi bi-eye"></i> Xem
+                                        </a>
+
+                                        @if (roleId == null)
+                                        {
+                                            <a asp-controller="Auth" asp-action="Login" class="btn btn-success btn-sm">
+                                                <i class="bi bi-box-arrow-in-right"></i> Đăng nhập để đăng ký
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <form asp-controller="Registrations" asp-action="Register" asp-route-courseId="@item.courseId" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="bi bi-pencil-square"></i> Đăng ký khóa học
+                                                </button>
+                                            </form>
+                                        }
+
+                                    }
                                 </div>
                             </div>
                         </div>

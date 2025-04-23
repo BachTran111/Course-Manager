@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -45,78 +44,70 @@ namespace CourseManager.Controllers
             return View(user);
         }
 
-        // GET: Users/Create
-        public IActionResult Create()
-        {
-            ViewData["RoleId"] = new SelectList(_context.Set<Role>(), "RoleId", "RoleId");
-            return View();
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,FullName,DateOfBirth,PhoneNumber,Email,Username,Password,RoleId")] User user)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["RoleId"] = new SelectList(_context.Set<Role>(), "RoleId", "RoleId", user.RoleId);
-            return View(user);
-        }
-
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var user = await _context.User.FindAsync(id);
-            if (user == null)
-            {
+            var userVM = await _context.User
+                .Where(u => u.UserId == id)
+                .Select(u => new UserEditModel
+                {
+                    UserId = u.UserId,
+                    FullName = u.FullName,
+                    DateOfBirth = u.DateOfBirth,
+                    PhoneNumber = u.PhoneNumber,
+                    Password = u.Password,
+                    RoleId = u.RoleId
+                })
+                .SingleOrDefaultAsync();
+
+            if (userVM == null)
                 return NotFound();
-            }
-            ViewData["RoleId"] = new SelectList(_context.Set<Role>(), "RoleId", "RoleId", user.RoleId);
-            return View(user);
+
+            return View(userVM);
         }
 
-        // POST: Users/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,FullName,DateOfBirth,PhoneNumber,Email,Username,Password,RoleId")] User user)
+        public async Task<IActionResult> Edit(int id, UserEditModel model)
         {
-            if (id != user.UserId)
-            {
+            if (id != model.UserId)
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
-                try
+                var user = await _context.User
+                .Where(u => u.UserId == id)
+                .Select(u => new User
                 {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserExists(user.UserId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                    UserId = u.UserId,
+                    FullName = u.FullName,
+                    DateOfBirth = u.DateOfBirth,
+                    PhoneNumber = u.PhoneNumber,
+                    Password = u.Password,
+                    RoleId = u.RoleId
+                })
+                .SingleOrDefaultAsync();
+                if (user == null)
+                    return NotFound();
+
+                user.FullName = model.FullName;
+                user.DateOfBirth = model.DateOfBirth;
+                user.PhoneNumber = model.PhoneNumber;
+                user.Password = model.Password;
+
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoleId"] = new SelectList(_context.Set<Role>(), "RoleId", "RoleId", user.RoleId);
-            return View(user);
+
+            return View(model);
         }
+
 
         // GET: Users/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -185,7 +176,10 @@ namespace CourseManager.Controllers
                 Email = vm.Email,
                 Username = vm.Username,
                 Password = vm.Password, 
-                RoleId = 2                
+                RoleId = 2,
+                FullName = "N/A",
+                PhoneNumber = "N/A",
+                DateOfBirth = new DateTime(2000, 1, 1)
             };
 
             _context.User.Add(user);

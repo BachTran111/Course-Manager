@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -46,14 +45,6 @@ namespace CourseManager.Controllers
             return View(registration);
         }
 
-        // GET: Registrations/Create
-        public IActionResult Create()
-        {
-            ViewData["CourseId"] = new SelectList(_context.Course, "courseId", "courseCode");
-            //ViewData["UserId"] = new SelectList(_context.User, "UserId", "FullName");
-            return View();
-        }
-
         // POST: Registrations/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -72,59 +63,37 @@ namespace CourseManager.Controllers
             return View(registration);
         }
 
-        // GET: Registrations/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var registration = await _context.Registration.FindAsync(id);
-            if (registration == null)
-            {
-                return NotFound();
-            }
-            ViewData["CourseId"] = new SelectList(_context.Course, "courseId", "courseCode", registration.CourseId);
-            ViewData["UserId"] = new SelectList(_context.User, "UserId", "FullName", registration.UserId);
-            return View(registration);
-        }
-
-        // POST: Registrations/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RegistrationId,CourseId,UserId,RegistrationDate")] Registration registration)
+        public IActionResult Register(int courseId)
         {
-            if (id != registration.RegistrationId)
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
             {
-                return NotFound();
+                return RedirectToAction("Users","Login"); 
             }
 
-            if (ModelState.IsValid)
+            var isAlreadyRegistered = _context.Registration
+                .Any(r => r.CourseId == courseId && r.UserId == userId);
+
+            if (isAlreadyRegistered)
             {
-                try
-                {
-                    _context.Update(registration);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!RegistrationExists(registration.RegistrationId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                TempData["Message"] = "Bạn đã đăng ký khóa học này!";
+                return RedirectToAction("Index", "Courses");
             }
-            ViewData["CourseId"] = new SelectList(_context.Course, "courseId", "courseCode", registration.CourseId);
-            ViewData["UserId"] = new SelectList(_context.User, "UserId", "FullName", registration.UserId);
-            return View(registration);
+
+            var registration = new Registration
+            {
+                CourseId = courseId,
+                UserId = userId.Value,
+                RegistrationDate = DateTime.Now
+            };
+
+            _context.Registration.Add(registration);
+            _context.SaveChanges();
+
+            TempData["Message"] = "Đăng ký khóa học thành công!";
+            return RedirectToAction("Index", "Courses");
         }
 
         // GET: Registrations/Delete/5
