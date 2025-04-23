@@ -48,16 +48,29 @@ namespace CourseManager.Controllers
         {
             return View();
         }
-
-        // POST: Courses/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("courseId,courseCode,courseName,instructor,startDate,fee,maxStudents")] Course course)
+        public async Task<IActionResult> Create([Bind("courseId,courseCode,courseName,instructor,startDate,fee,maxStudents")] Course course, IFormFile? imageFile)
         {
             if (ModelState.IsValid)
             {
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    // Tạo đường dẫn lưu file
+                    var fileName = Path.GetFileName(imageFile.FileName);
+                    var filePath = Path.Combine("wwwroot/uploads", fileName);
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+
+                    // Lưu file
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+
+                    // Lưu đường dẫn vào DB
+                    course.ImageUrl = "/uploads/" + fileName;
+                }
                 _context.Add(course);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -86,7 +99,7 @@ namespace CourseManager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("courseId,courseCode,courseName,instructor,startDate,fee,maxStudents")] Course course)
+        public async Task<IActionResult> Edit(int id, [Bind("courseId,courseCode,courseName,instructor,startDate,fee,maxStudents,imageUrl")] Course course, IFormFile imageFile)
         {
             if (id != course.courseId)
             {
@@ -97,6 +110,20 @@ namespace CourseManager.Controllers
             {
                 try
                 {
+                    // Nếu có ảnh mới được upload
+                    if (imageFile != null && imageFile.Length > 0)
+                    {
+                        var fileName = Path.GetFileName(imageFile.FileName);
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await imageFile.CopyToAsync(stream);
+                        }
+
+                        course.ImageUrl = "/images/" + fileName;
+                    }
+
                     _context.Update(course);
                     await _context.SaveChangesAsync();
                 }
@@ -115,6 +142,7 @@ namespace CourseManager.Controllers
             }
             return View(course);
         }
+
 
         // GET: Courses/Delete/5
         public async Task<IActionResult> Delete(int? id)

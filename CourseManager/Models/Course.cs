@@ -36,5 +36,9 @@ namespace CourseManager.Models
 
         [Column("max_students")]
         public int? maxStudents { get; set; }
+
+        [Column("image_url")]
+        public string? ImageUrl { get; set; }
+
     }
 }

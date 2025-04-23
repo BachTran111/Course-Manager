@@ -1,54 +1,51 @@
 ﻿@model CourseManager.Models.Course
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Course Details";
 }
 
-<h1>Details</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" class="card-img-top" alt="Course Image"
+                         style="height: 400px; object-fit: cover; border-top-left-radius: .375rem; border-top-right-radius: .375rem;" />
+                }
 
-<div>
-    <h4>Course</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.courseCode)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.courseCode)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.courseName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.courseName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.instructor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.instructor)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.startDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.startDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.fee)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.fee)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.maxStudents)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.maxStudents)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.courseId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                <div class="card-body">
+                    <h2 class="card-title text-primary">@Model.courseName</h2>
+                    <h5 class="text-muted">Mã khóa học: <strong>@Model.courseCode</strong></h5>
+
+                    <hr />
+
+                    <div class="mb-3">
+                        <strong>Giảng viên:</strong> @Model.instructor
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Ngày khai giảng:</strong> @Model.startDate?.ToString("dd/MM/yyyy")
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Học phí:</strong> @(Model.fee?.ToString("C") ?? "Miễn phí")
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Số lượng học viên:</strong> @(Model.maxStudents?.ToString() ?? "-")
+                    </div>
+
+                    <div class="mt-4">
+                        <a asp-action="Edit" asp-route-id="@Model.courseId" class="btn btn-outline-primary me-2">
+                            <i class="bi bi-pencil-square"></i> Chỉnh sửa
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

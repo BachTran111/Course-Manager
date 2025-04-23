@@ -1,72 +1,77 @@
 ﻿@{
     ViewData["Title"] = "Home";
+    var courses = ViewBag.Courses as List<Course>;
 }
 
 <div class="container py-5">
     <!-- Hero Section -->
-    <div class="row align-items-center mb-5">
-        <div class="col-lg-7">
-            <h1 class="display-3 fw-bold">Welcome to CourseManager</h1>
-            <p class="lead text-secondary">
-                Effortlessly manage your courses, registrations, and payments all in one place.
-            </p>
-            <a asp-controller="Courses" asp-action="Index" class="btn btn-primary btn-lg me-3">
-                <i class="bi bi-book me-1"></i>Browse Courses
-            </a>
-            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-lg">
-                <i class="bi bi-person-plus me-1"></i>Get Started
-            </a>
+    <section class="py-5" style="background: linear-gradient(to right, #e0f7fa, #f1f8e9);">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <h1 class="display-4 fw-semibold text-primary mb-3">
+                        Welcome to <span class="text-success">CourseManager</span>
+                    </h1>
+                    <p class="fs-5 text-secondary mb-4">
+                        Effortlessly manage your courses, registrations, and payments — all in one smart platform.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a asp-controller="Courses" asp-action="Index" class="btn btn-primary btn-lg">
+                            <i class="bi bi-book me-1"></i> Browse Courses
+                        </a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-person-plus me-1"></i> Get Started
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-5 text-center d-none d-lg-block">
+                    <i class="bi bi-journal-code display-1 text-muted"></i>
+                </div>
+            </div>
         </div>
-        <div class="col-lg-5 text-center">
-            <i class="bi bi-journal-code display-1 text-muted"></i>
-        </div>
-    </div>
+    </section>
+
+
 
     <hr class="my-5" />
 
     <!-- Features Section -->
-    <div class="row gy-4">
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 text-center">
-                <div class="card-body">
-                    <i class="bi bi-book display-4 text-primary"></i>
-                    <h5 class="card-title mt-3">Browse Courses</h5>
-                    <p class="card-text">
-                        Explore all available courses and find the right one for you.
-                    </p>
-                    <a asp-controller="Courses" asp-action="Index" class="btn btn-sm btn-primary">
-                        View Courses
-                    </a>
+    @if (Model != null && courses.Any())
+    {
+        <div class="row g-4">
+            @foreach (var course in courses)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        @if (!string.IsNullOrEmpty(course.ImageUrl))
+                        {
+                            <img src="@course.ImageUrl" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Course Image" />
+                        }
+                        else
+                        {
+                            <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <span class="text-white">No Image</span>
+                            </div>
+                        }
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">@course.courseName</h5>
+                            <p class="card-text mb-1"><strong>Instructor:</strong> @course.instructor</p>
+                            <p class="card-text mb-1"><strong>Start:</strong> @course.startDate?.ToString("dd/MM/yyyy")</p>
+                            <p class="card-text mb-3"><strong>Fee:</strong> @(course.fee?.ToString("C") ?? "Free")</p>
+                            <a asp-controller="Courses" asp-action="Details" asp-route-id="@course.courseId" class="btn btn-outline-primary mt-auto">View Details</a>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 text-center">
-                <div class="card-body">
-                    <i class="bi bi-person-plus display-4 text-success"></i>
-                    <h5 class="card-title mt-3">Create Account</h5>
-                    <p class="card-text">
-                        Sign up quickly to start registering for courses.
-                    </p>
-                    <a asp-controller="Account" asp-action="Register" class="btn btn-sm btn-success">
-                        Register Now
-                    </a>
-                </div>
-            </div>
+    }
+    else
+    {
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-emoji-frown display-4"></i>
+            <p class="mt-3 fs-5">Không có khóa học nào để hiển thị.</p>
         </div>
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 text-center">
-                <div class="card-body">
-                    <i class="bi bi-box-arrow-in-right display-4 text-warning"></i>
-                    <h5 class="card-title mt-3">Login</h5>
-                    <p class="card-text">
-                        Already have an account? Log in to manage your profile.
-                    </p>
-                    <a asp-controller="Account" asp-action="Login" class="btn btn-sm btn-warning text-white">
-                        Sign In
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+    }
+
 </div>

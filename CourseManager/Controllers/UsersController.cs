@@ -51,10 +51,6 @@ namespace CourseManager.Controllers
             ViewData["RoleId"] = new SelectList(_context.Set<Role>(), "RoleId", "RoleId");
             return View();
         }
-
-        // POST: Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserId,FullName,DateOfBirth,PhoneNumber,Email,Username,Password,RoleId")] User user)
@@ -220,7 +216,6 @@ namespace CourseManager.Controllers
                     return View(vm);
                 }
 
-                // Lưu thông tin vào session
                 HttpContext.Session.SetInt32("UserId", user.UserId);
                 HttpContext.Session.SetInt32("RoleId", user.RoleId);
                 HttpContext.Session.SetString("Username", user.Username);
@@ -229,7 +224,7 @@ namespace CourseManager.Controllers
 
                 if (user.RoleId == 1)
                 {
-                    return RedirectToAction("Index", "Admin");
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {

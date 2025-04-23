@@ -7,6 +7,7 @@ builder.Services.AddDbContext<CourseManagerContext>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
