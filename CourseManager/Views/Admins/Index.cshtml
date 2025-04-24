@@ -1,10 +1,15 @@
 ﻿@{
-    ViewData["Title"] = "Thống kê tổng quan";
+    var revenueByCourse = ViewBag.RevenueByCourse as IEnumerable<dynamic>;
+    var revenuePeriod = ViewBag.RevenuePeriod as IEnumerable<dynamic>;
+    var period = ViewBag.Period as string ?? "day";
+    var sortCourse = ViewBag.SortCourse as string ?? "desc";
+    var sortPeriod = ViewBag.SortPeriod as string ?? "asc";
 }
 
 <h2 class="mt-4">@ViewData["Title"]</h2>
 
 <div class="row mt-4">
+    <!-- Card tổng quan -->
     <div class="col-md-4">
         <div class="card text-white bg-primary mb-3">
             <div class="card-body">
@@ -13,7 +18,6 @@
             </div>
         </div>
     </div>
-
     <div class="col-md-4">
         <div class="card text-white bg-success mb-3">
             <div class="card-body">
@@ -22,7 +26,6 @@
             </div>
         </div>
     </div>
-
     <div class="col-md-4">
         <div class="card text-white bg-info mb-3">
             <div class="card-body">
@@ -32,3 +35,159 @@
         </div>
     </div>
 </div>
+
+<hr class="my-4" />
+
+<div class="row">
+    <!-- Doanh thu theo khóa học -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <span>Doanh thu theo khóa học</span>
+                <a asp-action="Index"
+                   asp-route-period="@period"
+                   asp-route-sortCourse="@(sortCourse=="asc"?"desc":"asc")"
+                   asp-route-sortPeriod="@sortPeriod"
+                   class="btn btn-sm btn-light">
+                    @(sortCourse == "asc" ? "asc" : "des")
+                    @if (sortCourse == "asc")
+                    {
+                        <i class="bi bi-sort-down"></i>
+                        ;
+                    }
+                    else
+                    {
+                        <i class="bi bi-sort-up"></i>
+                        ;
+                    }
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Khóa học</th>
+                            <th class="text-end">Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in revenueByCourse)
+                        {
+                            <tr>
+                                <td>@item.CourseName</td>
+                                <td class="text-end">@String.Format("{0:C}", item.TotalRevenue)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doanh thu theo ngày/tháng/năm -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <span>
+                    @(
+                        period == "day" ? "Doanh thu theo ngày"
+                        : period == "month" ? "Doanh thu theo tháng"
+                        : "Doanh thu theo năm"
+                        )
+                </span>
+
+                <div class="d-flex align-items-center">
+                    <!-- Select period -->
+                    <form method="get" asp-action="Index" class="d-flex align-items-center me-2">
+                        <select name="period" class="form-select form-select-sm" onchange="this.form.submit()">
+                            @if (period == "day")
+                            {
+                                <option value="day" selected>Ngày</option>
+                                <option value="month">Tháng</option>
+                                <option value="year">Năm</option>
+                            }
+                            else if (period == "month")
+                            {
+                                <option value="day">Ngày</option>
+                                <option value="month" selected>Tháng</option>
+                                <option value="year">Năm</option>
+                            }
+                            else
+                            {
+                                <option value="day">Ngày</option>
+                                <option value="month">Tháng</option>
+                                <option value="year" selected>Năm</option>
+                            }
+                            <!-- giữ sortCourse/sortPeriod để không mất khi submit -->
+                            <input type="hidden" name="sortCourse" value="@sortCourse" />
+                            <input type="hidden" name="sortPeriod" value="@sortPeriod" />
+                        </select>
+                    </form>
+
+                    <!-- Sort button: arrow up/down -->
+                    <a asp-action="Index"
+                       asp-route-period="@period"
+                       asp-route-sortCourse="@sortCourse"
+                       asp-route-sortPeriod="@(sortPeriod == "asc" ? "desc" : "asc")"
+                       class="btn btn-sm btn-light">
+                        @(sortPeriod == "asc" ? "asc" : "des")
+                        @if (sortPeriod == "asc")
+                        {
+                            <i class="bi bi-sort-down"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-sort-up"></i>
+                        }
+                    </a>
+
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <table class="table table-striped mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>
+                                @if (period == "day")
+                                {
+                                    <text>Ngày</text>
+                                }
+                                else if (period == "month")
+                                {
+                                    <text>Tháng</text>
+                                }
+                                else
+                                {
+                                    <text>Năm</text>
+                                }
+                            </th>
+                            <th class="text-end">Doanh thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in revenuePeriod)
+                        {
+                            <tr>
+                                <td class="text-nowrap">
+                                    @if (period == "day")
+                                    {
+                                        @item.Period.ToString("yyyy-MM-dd")
+                                    }
+                                    else if (period == "month")
+                                    {
+                                        @item.Period.ToString("MM/yyyy")
+                                    }
+                                    else
+                                    {
+                                        @item.Period.ToString("yyyy")
+                                    }
+                                </td>
+                                <td class="text-end">@String.Format("{0:C}", item.TotalRevenue)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>

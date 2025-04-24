@@ -43,7 +43,6 @@ namespace CourseManager.Models
         [Column("role_id")]
         public int RoleId { get; set; }
 
-        // Navigation property
         [ForeignKey("RoleId")]
         public virtual Role Role { get; set; }
     }

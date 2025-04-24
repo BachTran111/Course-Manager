@@ -1,0 +1,53 @@
+﻿@model CourseManager.Models.Payment
+
+@{
+    ViewData["Title"] = "Xác nhận thanh toán";
+}
+
+<div class="container mt-4">
+    <h2>Xác nhận thanh toán</h2>
+    <hr />
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Thông tin thanh toán</h4>
+
+            <dl class="row">
+                <dt class="col-sm-3">Mã thanh toán:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.PaymentId)</dd>
+
+                <dt class="col-sm-3">Mã đăng ký:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.RegistrationId)</dd>
+
+                <dt class="col-sm-3">Học viên:</dt>
+                <dd class="col-sm-9">
+                    @Model.Registration?.User?.FullName <!-- Giả sử có quan hệ User -->
+                </dd>
+
+                <dt class="col-sm-3">Số tiền:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Amount)</dd>
+
+                <dt class="col-sm-3">Ngày thanh toán:</dt>
+                <dd class="col-sm-9">
+                    @(Model.Date?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa xác nhận")
+                </dd>
+            </dl>
+
+            <form asp-action="Confirm">
+                <input type="hidden" asp-for="PaymentId" />
+
+                <div class="form-group">
+                    @if (Model.Date == null)
+                    {
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Xác nhận thanh toán
+                        </button>
+                    }
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

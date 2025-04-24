@@ -26,30 +26,19 @@ namespace CourseManager.Controllers
             return View(await courseManagerContext.ToListAsync());
         }
 
-        // GET: Users/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.User
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return View(user);
-        }
-
         // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            var currentUserId = HttpContext.Session.GetInt32("UserId");
+            if (currentUserId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (id == null || id != currentUserId)
+            {
                 return NotFound();
+            }
 
             var userVM = await _context.User
                 .Where(u => u.UserId == id)
@@ -66,37 +55,49 @@ namespace CourseManager.Controllers
                 .SingleOrDefaultAsync();
 
             if (userVM == null)
+            {
                 return NotFound();
+            }
 
             return View(userVM);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, User model)
         {
-            if (id != model.UserId)
+            var currentUserId = HttpContext.Session.GetInt32("UserId");
+            if (currentUserId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (id != currentUserId || id != model.UserId)
+            {
                 return NotFound();
+            }
 
             if (ModelState.IsValid)
             {
                 var user = await _context.User
-                .Where(u => u.UserId == id)
-                .Select(u => new User
-                {
-                    UserId = u.UserId,
-                    Username = u.Username,
-                    Email = u.Email,
-                    FullName = u.FullName,
-                    DateOfBirth = u.DateOfBirth,
-                    PhoneNumber = u.PhoneNumber,
-                    Password = u.Password,
-                    RoleId = u.RoleId
-                })
-                .SingleOrDefaultAsync();
+                    .Where(u => u.UserId == id)
+                    .Select(u => new User
+                    {
+                        UserId = u.UserId,
+                        Username = u.Username,
+                        Email = u.Email,
+                        FullName = u.FullName,
+                        DateOfBirth = u.DateOfBirth,
+                        PhoneNumber = u.PhoneNumber,
+                        Password = u.Password,
+                        RoleId = u.RoleId
+                    })
+                    .SingleOrDefaultAsync();
+
                 if (user == null)
+                {
                     return NotFound();
+                }
 
                 user.FullName = model.FullName;
                 user.DateOfBirth = model.DateOfBirth;
@@ -110,41 +111,6 @@ namespace CourseManager.Controllers
             }
 
             return View(model);
-        }
-
-
-        // GET: Users/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.User
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(m => m.UserId == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return View(user);
-        }
-
-        // POST: Users/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var user = await _context.User.FindAsync(id);
-            if (user != null)
-            {
-                _context.User.Remove(user);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool UserExists(int id)
@@ -167,7 +133,6 @@ namespace CourseManager.Controllers
                 return View(vm);
             }
 
-            // Kiểm tra trùng Username
             bool usernameExists = await _context.User.AnyAsync(u => u.Username == vm.Username);
             if (usernameExists)
             {
@@ -231,7 +196,6 @@ namespace CourseManager.Controllers
             }
             catch (Exception ex)
             {
-                // Ghi log nếu cần
                 Console.WriteLine("Đăng nhập lỗi: " + ex.Message);
                 ModelState.AddModelError(string.Empty, "Đã xảy ra lỗi trong quá trình đăng nhập. Vui lòng thử lại.");
                 return View(vm);
@@ -242,14 +206,11 @@ namespace CourseManager.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Logout()
         {
-            // Xóa toàn bộ session
             HttpContext.Session.Clear();
 
-            // Có thể thêm log nếu cần
             Console.WriteLine("Người dùng đã đăng xuất.");
 
-            // Điều hướng về trang đăng nhập hoặc trang chủ
-            return RedirectToAction("Login", "Users"); // hoặc "Index", "Home"
+            return RedirectToAction("Login", "Users");
         }
 
     }

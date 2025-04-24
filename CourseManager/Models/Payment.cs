@@ -22,7 +22,6 @@ namespace CourseManager.Models
         [DataType(DataType.DateTime)]
         public DateTime? Date { get; set; }
 
-        // Navigation property
         [ForeignKey("RegistrationId")]
         public virtual Registration Registration { get; set; }
     }

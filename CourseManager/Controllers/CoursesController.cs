@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CourseManager.Data;
 using CourseManager.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CourseManager.Controllers
 {
@@ -32,7 +33,6 @@ namespace CourseManager.Controllers
                             RegisteredCount = g.Count(r => r != null)
                         };
 
-            // Áp dụng sắp xếp
             query = sortOrder switch
             {
                 "price_asc" => query.OrderBy(c => c.Course.fee),
@@ -69,6 +69,11 @@ namespace CourseManager.Controllers
         // GET: Courses/Create
         public IActionResult Create()
         {
+            var currentRoleId = HttpContext.Session.GetInt32("RoleId");
+            if (currentRoleId != 1)
+            {
+                return NotFound();
+            }
             return View();
         }
         [HttpPost]
@@ -79,19 +84,15 @@ namespace CourseManager.Controllers
             {
                 if (imageFile != null && imageFile.Length > 0)
                 {
-                    // Tạo đường dẫn lưu file
                     var fileName = Path.GetFileName(imageFile.FileName);
                     var filePath = Path.Combine("wwwroot/uploads", fileName);
 
                     Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
 
-                    // Lưu file
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await imageFile.CopyToAsync(stream);
                     }
-
-                    // Lưu đường dẫn vào DB
                     course.ImageUrl = "/uploads/" + fileName;
                 }
                 _context.Add(course);
@@ -101,9 +102,14 @@ namespace CourseManager.Controllers
             return View(course);
         }
 
-        // GET: Courses/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            var currentRoleId = HttpContext.Session.GetInt32("RoleId");
+            if (currentRoleId != 1)
+            {
+                return NotFound();
+            }
+
             if (id == null)
             {
                 return NotFound();
@@ -117,9 +123,6 @@ namespace CourseManager.Controllers
             return View(course);
         }
 
-        // POST: Courses/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("courseId,courseCode,courseName,instructor,startDate,fee,maxStudents,imageUrl")] Course course, IFormFile imageFile)
@@ -133,7 +136,6 @@ namespace CourseManager.Controllers
             {
                 try
                 {
-                    // Nếu có ảnh mới được upload
                     if (imageFile != null && imageFile.Length > 0)
                     {
                         var fileName = Path.GetFileName(imageFile.FileName);
@@ -170,6 +172,11 @@ namespace CourseManager.Controllers
         // GET: Courses/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            var currentRoleId = HttpContext.Session.GetInt32("RoleId");
+            if (currentRoleId != 1)
+            {
+                return NotFound();
+            }
             if (id == null)
             {
                 return NotFound();

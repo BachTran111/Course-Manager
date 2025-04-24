@@ -91,7 +91,6 @@ namespace CourseManager.Controllers
                 return RedirectToAction("Index", "Courses");
             }
 
-            // Kiểm tra số lượng
             if (course.maxStudents.HasValue && registeredCount >= course.maxStudents.Value)
             {
                 TempData["Message"] = "Khóa học đã đủ số lượng sinh viên!";
