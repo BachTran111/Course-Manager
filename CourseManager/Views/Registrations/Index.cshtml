@@ -1,47 +1,97 @@
 ﻿@model IEnumerable<CourseManager.Models.Registration>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Khóa học của tôi";
+    var userId = Context.Session.GetInt32("UserId");
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.RegistrationDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Course)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.RegistrationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Course.courseCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.FullName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.RegistrationId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.RegistrationId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.RegistrationId">Delete</a>
-            </td>
-        </tr>
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-1"></i> @TempData["Message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 }
-    </tbody>
-</table>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-1"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+<div class="container mt-5">
+    <h2 class="text-primary mb-4">@ViewData["Title"]</h2>
+
+    <div class="row">
+        @foreach (var reg in Model)
+        {
+            var course = reg.Course;
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            @if (!string.IsNullOrEmpty(course.ImageUrl))
+                            {
+                                <img src="@course.ImageUrl"
+                                     class="img-fluid rounded-start"
+                                     style="width:100%; height:200px; object-fit:cover;"
+                                     alt="Course Image" />
+                            }
+                            else
+                            {
+                                <div class="bg-light d-flex align-items-center justify-content-center"
+                                     style="width:100%; height:200px;">
+                                    <span class="text-muted">Không có ảnh</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">@course.courseName</h5>
+                                <p class="card-text mb-1">
+                                    <strong>Mã KH:</strong> @course.courseCode
+                                    &nbsp;|&nbsp;
+                                    <strong>Giảng viên:</strong> @course.instructor
+                                </p>
+                                <p class="card-text mb-1">
+                                    <strong>Khai giảng:</strong>
+                                    @course.startDate?.ToString("yyyy-MM-dd")
+                                    &nbsp;|&nbsp;
+                                    <strong>Học phí:</strong>
+                                    @(course.fee.HasValue ? course.fee.Value.ToString("C") : "-")
+                                </p>
+
+                                <div class="d-flex">
+                                    <!-- Xem chi tiết -->
+                                    <a asp-controller="Courses" asp-action="Details" asp-route-id="@course.courseId"
+                                       class="btn btn-info btn-sm me-2 text-white">
+                                        <i class="bi bi-eye me-1"></i>Chi tiết
+                                    </a>
+
+                                    <!-- Hủy đăng ký -->
+
+                                    <form asp-controller="Registrations" asp-action="Cancel" asp-route-registrationId="@reg.RegistrationId" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="bi bi-x-circle me-1"></i> Hủy đăng ký
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            Bạn chưa đăng ký khóa học nào.
+        </div>
+    }
+
+</div>

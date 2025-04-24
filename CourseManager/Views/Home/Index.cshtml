@@ -5,31 +5,37 @@
 
 <div class="container py-5">
     <!-- Hero Section -->
-    <section class="py-5" style="background: linear-gradient(to right, #e0f7fa, #f1f8e9);">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-7">
-                    <h1 class="display-4 fw-semibold text-primary mb-3">
-                        Welcome to <span class="text-success">CourseManager</span>
+    <section class="d-flex align-items-center position-relative" style="min-height: 60vh; background: linear-gradient(90deg, #0052D9 0%, #4364F7 50%, #6FB1FC 100%); overflow: hidden;">
+        <div class="position-absolute top-50 end-0 translate-middle-y" style="font-size: 10rem; opacity: 0.1; margin-right: 10%; z-index: 0;">
+            <span class="text-white fw-bold">&lt;/&gt;</span>
+        </div>
+
+        <div class="container text-center text-lg-start position-relative" style="z-index: 1;">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h1 class="display-3 fw-bold text-white mb-3">
+                        Học Code Cùng <span class="text-warning">Chúng Tôi</span>
                     </h1>
-                    <p class="fs-5 text-secondary mb-4">
-                        Effortlessly manage your courses, registrations, and payments — all in one smart platform.
+                    <p class="lead text-white-50 mb-4">
+                        Hãy bắt đầu từ con số 0. <em>From Zero To Hero</em>
                     </p>
-                    <div class="d-flex flex-wrap gap-3">
-                        <a asp-controller="Courses" asp-action="Index" class="btn btn-primary btn-lg">
-                            <i class="bi bi-book me-1"></i> Browse Courses
+                    <div class="d-flex justify-content-center justify-content-lg-start gap-3">
+                        <a asp-controller="Courses" asp-action="Index" class="btn btn-light btn-lg shadow-sm">
+                            <i class="bi bi-book me-1"></i> Khóa Học
                         </a>
-                        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary btn-lg">
-                            <i class="bi bi-person-plus me-1"></i> Get Started
+                        <a asp-controller="Users" asp-action="Register" class="btn btn-outline-light btn-lg shadow-sm">
+                            <i class="bi bi-person-plus me-1"></i> Đăng ký
                         </a>
                     </div>
                 </div>
                 <div class="col-lg-5 text-center d-none d-lg-block">
-                    <i class="bi bi-journal-code display-1 text-muted"></i>
+                    <i class="bi bi-journal-code display-1 text-white opacity-75"></i>
                 </div>
             </div>
         </div>
     </section>
+
+
 
 
 
@@ -39,7 +45,7 @@
     @if (Model != null && courses.Any())
     {
         <div class="row g-4">
-            @foreach (var course in courses)
+            @foreach (var course in courses.Take(6))
             {
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 shadow-sm border-0">
@@ -74,4 +80,9 @@
         </div>
     }
 
+</div>
+<div class="text-center mt-4">
+    <a asp-controller="Courses" asp-action="Index" class="btn btn-primary">
+        <i class="bi bi-arrow-right-circle me-1"></i> Xem thêm khóa học
+    </a>
 </div>

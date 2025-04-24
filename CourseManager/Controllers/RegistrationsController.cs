@@ -21,8 +21,21 @@ namespace CourseManager.Controllers
         // GET: Registrations
         public async Task<IActionResult> Index()
         {
-            var courseManagerContext = _context.Registration.Include(r => r.Course).Include(r => r.User);
-            return View(await courseManagerContext.ToListAsync());
+            // Lấy UserId từ Session
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+            {
+                return NotFound();
+            }
+
+            var registrations = await _context.Registration
+                .Where(r => r.UserId == userId)
+                .Include(r => r.Course)
+                .ToListAsync();
+
+            ViewData["UserId"] = userId;
+            return View(registrations);
         }
 
         // GET: Registrations/Details/5
@@ -42,24 +55,6 @@ namespace CourseManager.Controllers
                 return NotFound();
             }
 
-            return View(registration);
-        }
-
-        // POST: Registrations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RegistrationId,CourseId,UserId,RegistrationDate")] Registration registration)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(registration);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CourseId"] = new SelectList(_context.Course, "courseId", "courseCode", registration.CourseId);
-            ViewData["UserId"] = new SelectList(_context.User, "UserId", "FullName", registration.UserId);
             return View(registration);
         }
 
@@ -111,44 +106,33 @@ namespace CourseManager.Controllers
             return RedirectToAction("Index", "Courses");
         }
 
-        // GET: Registrations/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Cancel(int registrationId)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var registration = await _context.Registration
+            var registration = _context.Registration
                 .Include(r => r.Course)
-                .Include(r => r.User)
-                .FirstOrDefaultAsync(m => m.RegistrationId == id);
+                .FirstOrDefault(r => r.RegistrationId == registrationId);
+
             if (registration == null)
             {
-                return NotFound();
+                TempData["Error"] = "Không tìm thấy đăng ký.";
+                return RedirectToAction("Index");
             }
 
-            return View(registration);
-        }
-
-        // POST: Registrations/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var registration = await _context.Registration.FindAsync(id);
-            if (registration != null)
+            if (registration.Course.startDate <= DateTime.Now)
             {
-                _context.Registration.Remove(registration);
+                TempData["Error"] = "Không thể hủy khóa học đã khai giảng.";
+                return RedirectToAction("Index");
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            _context.Registration.Remove(registration);
+            _context.SaveChanges();
+
+            TempData["Message"] = "Hủy đăng ký thành công.";
+            return RedirectToAction("Index");
         }
 
-        private bool RegistrationExists(int id)
-        {
-            return _context.Registration.Any(e => e.RegistrationId == id);
-        }
     }
+
 }
